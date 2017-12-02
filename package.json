@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "nodemon ./bin/www"
   },
   "dependencies": {
     "body-parser": "*",
@@ -14,5 +14,8 @@
     "morgan": "*",
     "serve-favicon": "*",
     "unirest": "latest"
+  },
+  "devDependencies": {
+    "nodemon": "^1.12.1"
   }
 }
