@@ -13,6 +13,7 @@
     "geoip-lite": "^1.2.1",
     "jade": "*",
     "morgan": "*",
+    "request": "^2.83.0",
     "serve-favicon": "*",
     "unirest": "latest"
   },

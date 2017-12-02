@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var request = require('request');
 
 var app = express();
 var config = require('.././config.json')[app.get('env')];
@@ -45,6 +46,49 @@ router.get('/', function(req, res, next) {
 		}
 	});
 });
+
+router.get('/tax', (req, res, next) => {
+	const request_params = req.query;
+
+	console.log(request_params);
+
+	const url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' +
+        request_params.latitude + ',' +
+        request_params.longitude +'&key=' +
+        config.googleAccessToken;
+
+    console.log(url);
+
+	request.get(url,
+        (error, response, body) => {
+        	console.log(error);
+        	console.log(response.status);
+        	var locData = JSON.parse(body);
+        	console.log(locData.results[0].address_components);
+        	extractLocation(locData.results[0].address_components);
+        	return res.json({tax: 123});
+        });
+});
+
+function extractLocation(loc) {
+	var country;
+	var state;
+	var zip;
+
+	loc.forEach((l) => {
+		if (l.types[0] === 'postal_code') {
+			zip = l.long_name;
+		}else if (l.types[0] === 'country') {
+			country = l.long_name;
+		}else if (l.types[0] === 'administrative_area_level_1') {
+			state = l.short_name;
+		}
+	})
+	var locData = { country, state, zip };
+	console.log('a');
+	console.log(locData);
+	return locData;
+}
 
 router.post('/charges/charge_card', function(req,res,next){
 	var request_params = req.body;
