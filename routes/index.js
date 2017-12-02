@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var request = require('request');
+var taxData = require('./tax.json');
 
 var app = express();
 var config = require('.././config.json')[app.get('env')];
@@ -65,8 +66,19 @@ router.get('/tax', (req, res, next) => {
       console.log(response.status);
       var locData = JSON.parse(body);
       console.log(locData.results[0].address_components);
-      extractLocation(locData.results[0].address_components);
-      return res.json({tax: 123});
+      locData = extractLocation(locData.results[0].address_components);
+
+      var tax;
+
+      if (locData.country === 'canada') {
+        tax = taxData[locData.country][locData.state];
+      } else {
+        tax = taxData[locData.country][locData.state][locData.zip];
+      }
+
+      console.log(tax);
+
+      return res.json({tax});
     });
 });
 
