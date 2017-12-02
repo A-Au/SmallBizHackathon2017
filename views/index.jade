@@ -149,6 +149,7 @@ block content
   </div>
 
   script(type='text/javascript').
+    var tax;
     var cardNonce;
     var paymentForm = new SqPaymentForm({
       applicationId: '#{square_application_id}',
@@ -264,32 +265,40 @@ block content
       }[id];
     }
 
+    function updateTaxAndProductTotal(){
+        var productCost = getCostByProductId(document.getElementById('product_id').value);
+        document.getElementById("tax").innerHTML = tax*100+" %";
+        document.getElementById("product_total").innerHTML = "$"+(productCost*(1+tax)).toFixed(2);
+    }
+
     function updateTotalProductCost(){
       navigator.geolocation.getCurrentPosition(position => {
       var latitude = position.coords.latitude;
       var longitude = position.coords.longitude;
       
-      var xhr = new XMLHttpRequest();
-      var params = {
-      	latitude: latitude,
-      	longitude: longitude
-      };
-      params = `latitude=${encodeURIComponent(latitude)}`+
-               `&longitude=${encodeURIComponent(longitude)}`;
+      if (typeof tax === "undefined"){
+          var xhr = new XMLHttpRequest();
+          var params = {
+          	latitude: latitude,
+          	longitude: longitude
+          };
+          params = `latitude=${encodeURIComponent(latitude)}`+
+                   `&longitude=${encodeURIComponent(longitude)}`;
 
-      xhr.open("get", "/tax?"+params, true);
+          xhr.open("get", "/tax?"+params, true);
 
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState == XMLHttpRequest.DONE) {
-            var res = JSON.parse(xhr.response);
-            var tax = res.tax;
-            var productCost = getCostByProductId(document.getElementById('product_id').value);
-            document.getElementById("tax").innerHTML = tax*100+" %";
-            document.getElementById("product_total").innerHTML = "$"+(productCost*(1+tax)).toFixed(2);
+          xhr.onreadystatechange = function() {
+            if (xhr.readyState == XMLHttpRequest.DONE) {
+                var res = JSON.parse(xhr.response);
+                tax = res.tax;
+                updateTaxAndProductTotal();
+            }
+          }
+
+          xhr.send(params);
+        } else{
+          updateTaxAndProductTotal();
         }
-      }
-
-      xhr.send(params);
     }, err => {
       console.log(err);
     });
