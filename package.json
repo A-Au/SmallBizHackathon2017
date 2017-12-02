@@ -10,6 +10,7 @@
     "cookie-parser": "*",
     "debug": "*",
     "express": "*",
+    "geoip-lite": "^1.2.1",
     "jade": "*",
     "morgan": "*",
     "serve-favicon": "*",

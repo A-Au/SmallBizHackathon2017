@@ -24,6 +24,10 @@ block content
   <label>Email</label>
   <input type="email" id="email" name="email"  placeholder="Email"/>
 
+  <label>Location</label>
+  <div id="loc-lat"></div>
+  <div id="loc-lng"></div>
+
 
   <h3> Shipping Address </h3>
 
@@ -245,6 +249,24 @@ block content
           };
         },
       }
+    });
+
+    navigator.geolocation.getCurrentPosition(s => {
+      console.log(s);
+      document.getElementById('loc-lng').innerHTML = s.coords.longitude;
+      document.getElementById('loc-lat').innerHTML = s.coords.latitude;
+      var locReq = new XMLHttpRequest();
+      locReq.onreadystatechange = function() {
+        if (locReq.readyState == XMLHttpRequest.DONE) {
+            console.log(JSON.parse(locReq.response));
+        }
+      }
+      locReq.open('GET', 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' +
+        s.coords.latitude + ',' + s.coords.longitude +'&key=AIzaSyBRERrjDzzlctWc6WWz8aOx62E68kKtxMg');
+      locReq.send();
+      console.log(locReq.status);
+    }, err => {
+      document.getElementById('loc-lng').innerHTML = err;
     });
 
     // build payment form after DOM load
